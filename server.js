@@ -14,6 +14,11 @@ app.use((err, req, res, next)=> {
   res.status(err.status || 500).send({ message: err.message});
 });
 
+app.post('/api/auth', (req, res, next) => {
+  db.authenticate(req.body)
+    .then(token => res.send({token}))
+    .catch(next);
+});
 
 db.sync()
   .then(()=> {

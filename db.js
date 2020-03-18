@@ -9,12 +9,17 @@ client.connect();
 const sync = async()=> {
   const SQL = `
   CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+  DROP TABLE IF EXISTS roles;
   DROP TABLE IF EXISTS users;
   CREATE TABLE users(
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR NOT NULL,
     CHECK (char_length(username) > 0)
+  );
+  CREATE TABLE roles(
+    name VARCHAR(100),
+    username VARCHAR(100) REFERENCES users(username)
   );
   `;
   await client.query(SQL);
@@ -25,7 +30,7 @@ const sync = async()=> {
   ]);
 
   //console.log( await readUsers() );
-  await authenticate({username: 'lucy', password: 'LUCY'});
+  console.log(await authenticate({username: 'lucy', password: 'LUCY'}));
 };
 
 const createUser = async({ username, password })=> {
@@ -76,5 +81,9 @@ const hash = (plain)=> {
 
 
 module.exports = {
-  sync
+  sync,
+  findUserFromToken,
+  authenticate,
+  compare,
+  hash
 };
